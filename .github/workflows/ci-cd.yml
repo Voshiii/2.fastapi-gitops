@@ -67,7 +67,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Build docker image
-        run: docker build -t fastapi-gitops-starter .
+        run: docker build -t fastapi-gitops-starter:latest -f docker/Dockerfile .
 
       - name: Add tag image on release
         if: github.event_name == 'release'
