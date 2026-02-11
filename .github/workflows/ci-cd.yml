@@ -19,6 +19,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Lint code
+        run: ruff check app/ tests/ --fix
+
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -27,6 +31,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Run coverage test
+        run: pytest --cov=app --cov-report=html --cov-fail-under=80
 
   build:
     name: Build Docker Image
@@ -40,3 +47,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Build docker image
+        run: docker build -t fastapi-gitops-starter .
+
+      - name: Add tag image on release
+        if: github.event_name == 'release'
+        run: |
+          docker tag fastapi-gitops-starter:latest \
+          fastapi-gitops-starter:${{ github.ref_name }}
+
+      - name: Push Docker image
+        run: |
+          docker push fastapi-gitops-starter:latest
+          if [ "${GITHUB_EVENT_NAME}" = "release" ]; then
+            docker push fastapi-gitops-starter:${GITHUB_REF_NAME}
+          fi
+
