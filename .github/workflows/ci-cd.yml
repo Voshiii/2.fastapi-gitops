@@ -60,9 +60,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-#      - name: Log in to Docker Hub
-#        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-
       - name: Build docker image
         run: docker build -t ${{ secrets.REGISTRY_USERNAME }}/fastapi-gitops-starter:latest -f docker/Dockerfile .
 
@@ -71,6 +68,12 @@ jobs:
         run: |
           docker tag ${{ secrets.REGISTRY_USERNAME }}/fastapi-gitops-starter:latest \
           ${{ secrets.REGISTRY_USERNAME }}/fastapi-gitops-starter:${{ github.ref_name }}
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Push Docker image
         run: |
