@@ -6,18 +6,19 @@ replicaCount: 1
 
 image:
   repository: voshiii/fastapi-gitops-starter
-  pullPolicy: IfNotPresent
+#  pullPolicy: IfNotPresent
+  pullPolicy: Never
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
 registry:
-  createImagePullSecret: true
-  secretName: image-pull-secret
-  server: ghcr.io
+  createImagePullSecret: false
+  secretName: ""
+  server: ""
   token: ""
 
-imagePullSecrets:
-  - name: image-pull-secret
+#imagePullSecrets:
+#  - name: image-pull-secret
 
 nameOverride: ""
 fullnameOverride: ""
@@ -50,7 +51,7 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8000
   targetPort: 8000
   annotations: {}
 
@@ -79,8 +80,8 @@ resources:
 
 livenessProbe:
   httpGet:
-    path: /GitOps-Starter/health
-    port: http
+    path: /health #/GitOps-Starter/health
+    port: 8000
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
@@ -88,18 +89,18 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /GitOps-Starter/health
-    port: http
+    path: /health #/GitOps-Starter/health
+    port: 8000
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 3
   failureThreshold: 3
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 2
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 10
   targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
